@@ -165,7 +165,7 @@ This is simply a list of keys that will always be removed from the data arrays p
 
 ### `$field_info`
 
-This is an array of field definitions which may be used (in combination with `prep_data()`) to define the model's interaction with the database. If `field_info` is empty, the model will query the database to fill this array when using `get_field_info()`. The `field_info` array could also be used by a controller to help map post data to the fields in the model. See CodeIgniter's `$this->db->field_data()` [http://ellislab.com/codeigniter/user-guide/database/fields.html](http://ellislab.com/codeigniter/user-guide/database/fields.html)
+This is an array of field definitions which may be used (in combination with `prep_data()`) to define the model's interaction with the database. If `field_info` is empty, the model will query the database to fill this array when using `get_field_info()`. The `field_info` array could also be used by a controller to help map post data to the fields in the model. See CodeIgniter's `$this->db->field_data()` [http://www.codeigniter.com/user-guide/database/fields.html](http://www.codeigniter.com/user-guide/database/fields.html)
 
 The field definition should be as follows:
 
@@ -462,9 +462,9 @@ Returns the `$field_info` array, attempting to populate it from the database if 
 
 ### `prep_data()`
 
-Intended to be called by a controller and/or extended in the model, `prep_data` processes an array of field/value pairs (can be the result of `$this->input->post()`) and attempts to setup a `$data` array suitable for use in the model's `insert`/`update` methods. The output array will not include the model's `key`, `created_on`, `created_by`, `modified_on`, `modified_by`, `deleted`, or `deleted_by` fields, or fields indicated as the primary key in the model's `field_info` array.
+Intended to be called by a controller and/or extended in the model, `prep_data()` processes an array of field/value pairs (can be the result of `$this->input->post()`) and attempts to setup a `$data` array suitable for use in the model's `insert`/`update` methods. The output array will not include the model's `key`, `created_on`, `created_by`, `modified_on`, `modified_by`, `deleted`, or `deleted_by` fields, or fields indicated as the primary key in the model's `field_info` array.
 
-For example, the user_model extends prep_data to map field names from the view that don't match the tables in the database and ensure fields that should not be set are not set:
+For example, the `user_model` extends `prep_data()` to map field names from the view that don't match the tables in the database and ensure fields that should not be set are not set:
 
 
     public function prep_data($post_data)
@@ -499,33 +499,33 @@ For example, the user_model extends prep_data to map field names from the view t
 The User Settings controller then uses the model's `prep_data` method to process the post data before inserting/updating the user:
 
 
-	private function save_user($type='insert', $id=0, $meta_fields=array(), $cur_role_name = '')
+	private function saveUser($type = 'insert', $id = 0, $meta_fields = array())
 	{
         /* ... Omitting validation setup and gathering of user_meta data ... */
 
-		// Compile our core user elements to save.
+        // Compile our core user elements to save.
         $data = $this->user_model->prep_data($this->input->post());
+        $result = false;
 
-		if ($type == 'insert') {
-			$activation_method = $this->settings_lib->item('auth.user_activation_method');
+        if ($type == 'insert') {
+            $activationMethod = $this->settings_lib->item('auth.user_activation_method');
+            if ($activationMethod == 0) {
+                // No activation method, so automatically activate the user.
+                $data['active'] = 1;
+            }
 
-			// No activation method
-			if ($activation_method == 0) {
-				// Activate the user automatically
-				$data['active'] = 1;
-			}
-
-			$return = $this->user_model->insert($data);
-			$id = $return;
-		} else {	// Update
-			$return = $this->user_model->update($id, $data);
-		}
+            $id = $this->user_model->insert($data);
+            if (is_numeric($id)) {
+                $result = $id;
+            }
+        } else {
+            $result = $this->user_model->update($id, $data);
+        }
 
         /* ... Omitting saving user_meta data and event trigger ... */
 
-		return $return;
-
-	}//end save_user()
+        return $result;
+	}
 
 
 <a name="returns"></a>
@@ -549,7 +549,7 @@ A chainable method that specifies the model should return the results as a JSON 
 <a name="chainable"></a>
 ## Chainable Methods
 
-Thanks to CodeIgniter's [ActiveRecord](http://ellislab.com/codeigniter/user-guide/database/active_record.html) library, it is very simply to modify the BF_Model's methods. This can be done through either chainable methods or by extending methods.
+Thanks to CodeIgniter's [ActiveRecord](http://www.codeigniter.com/user_guide/database/active_record.html) library, it is very simply to modify the BF_Model's methods. This can be done through either chainable methods or by extending methods.
 
 Chainable methods are a feature of PHP 5 and higher that allow you to return the results of one function into another, and to keep this 'chain' of events continuing through several functions. Bonfire duplicates several of the stock ActiveRecord methods in BF_Model to make it simple and elegant to customize your queries.
 
@@ -580,7 +580,7 @@ Bonfire's model supports chaining for most of the ActiveRecord methods available
 * offset
 * set
 
-All of these methods accept the same parameters as their [CodeIgniter](http://ellislab.com/codeigniter/user-guide/database/active_record.html) counterparts. These are included for the sole reason of making your syntax more expressive. You can now do things like:
+All of these methods accept the same parameters as their [CodeIgniter](http://www.codeigniter.com/user_guide/database/active_record.html) counterparts. These are included for the sole reason of making your syntax more expressive. You can now do things like:
 
     $this->user_model->where('city', 'Detroit')
                      ->or_where('city', 'Cleveland')
@@ -714,13 +714,13 @@ The model should contain all of the validation rules for your data so that it is
 
 ### Basic Validation
 
-The `$validation_rules` variable can take an array of data that follows the same format as CodeIgniter's [Form Validation Library](http://ellislab.com/codeigniter/user-guide/libraries/form_validation.html#validationrulesasarray).
+The `$validation_rules` variable can take an array of data that follows the same format as CodeIgniter's [Form Validation Library](http://www.codeigniter.com/user-guide/libraries/form_validation.html#validationrulesasarray).
 
     protected $validation_rules = array(
         array(
             'field' => 'username',
             'label' => 'Username',
-            'rules' => 'trim|strip_tags|min_length[4]|xss_clean'
+            'rules' => 'trim|strip_tags|min_length[4]'
         ),
         array(
             'field' => 'password',

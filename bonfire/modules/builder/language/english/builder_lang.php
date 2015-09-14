@@ -120,6 +120,7 @@ $lang['mb_form_module_db_no']	= 'None';
 $lang['mb_form_module_db_create']	= 'Create New Table';
 $lang['mb_form_module_db_exists']	= 'Build from Existing Table';
 $lang['mb_form_build']			= 'Build the Module';
+$lang['mb_form_none_of_the_above']  = 'None of these';
 
 // Activities
 $lang['mb_act_create']			= 'Created Module';
@@ -141,6 +142,7 @@ $lang['mb_context_create_intro']    = 'Creates and sets up a new Context.';
 $lang['mb_roles_label']         = 'Allow for Roles:';
 $lang['mb_context_migrate']     = 'Create an Application Migration?';
 $lang['mb_context_submit']      = 'Create It';
+$lang['mb_context_create_intro_note'] = 'Note: The builder will <strong>not</strong> setup routing for the new context. You will usually need to add a route for the new context in /application/config/routes.php.';
 
 // Create Module
 $lang['mb_module_table_not_exist']  = 'The specified table name does not exist';
